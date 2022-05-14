@@ -1,4 +1,6 @@
 import os
+from datetime import time
+
 import tensorflow.compat.v1 as tf
 
 tf.compat.v1.disable_eager_execution()
@@ -87,15 +89,15 @@ saver.restore(sess, tf.train.latest_checkpoint('my_net'))
 def recognize(image):
     res = sess.run(results, feed_dict={x: [image / 255.0], keep_prob_5: 1.0, keep_prob_75: 1.0})
     if res[0] == 0:
-        return '陈磊'
-    if res[0] == 1:
-        return '冯靖轩'
-    if res[0] == 2:
         return '付迪'
+    if res[0] == 1:
+        return '陈磊'
+    if res[0] == 2:
+        return '冯靖轩'
     if res[0] == 3:
-        return '高康悦'
-    if res[0] == 4:
         return '匡斌'
+    if res[0] == 4:
+        return '高康悦'
     else:
         return 'unknown'
     # return str(res)
@@ -108,17 +110,16 @@ detector = dlib.get_frontal_face_detector()
 # './other_faces': 5}"
 
 
-path = input("若检测视频输入正确路径否则为摄像头检测：")
+path = input("请输入视频文件所在路径，否则将使用摄像头：")
 if os.path.exists(path):
     cam = cv2.VideoCapture(path)
     print('找到对应文件，开始准备检测')
 else:
     cam = cv2.VideoCapture(0)
-    print('摄像头检测')
+    print('未找到文件，使用摄像头检测')
 
 while True:
     _, img = cam.read()
-    cv2.imshow('image', img)
     cv2.waitKey(100)
     gray_image = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     dets = detector(gray_image, 1)
@@ -137,6 +138,7 @@ while True:
         print('%s' % recognize(face))
 
         cv2.rectangle(img, (x2, x1), (y2, y1), (255, 0, 0), 3)
+        cv2.namedWindow("image", 0)
         cv2.imshow('image', img)
         key = cv2.waitKey(30) & 0xff
         if key == 27:
