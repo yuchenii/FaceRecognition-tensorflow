@@ -1,4 +1,5 @@
 import tensorflow.compat.v1 as tf
+from tensorflow.python.ops.logging_ops import scalar_summary
 
 tf.compat.v1.disable_eager_execution()
 import cv2
@@ -12,6 +13,7 @@ from sklearn.preprocessing import LabelEncoder
 # 自动分配显存
 from tensorflow.compat.v1 import ConfigProto
 from tensorflow.compat.v1 import InteractiveSession
+import tensorboard
 
 
 config = ConfigProto()
@@ -206,7 +208,7 @@ def cnnTrain():
 
         sess.run(tf.global_variables_initializer())
 
-        summary_writer = tf.summary.FileWriter('./tmp', graph=tf.get_default_graph())
+        summary_writer = tf.summary.FileWriter('./logs', graph=tf.get_default_graph())
 
         for r in range(1):  # 训练轮数
             print('Round', r + 1)
@@ -222,14 +224,12 @@ def cnnTrain():
                     train_loss_results.append(loss)
                     summary_writer.add_summary(summary, n * num_batch + i)
 
-                    # 打印损失
-                    # print(n * num_batch + i, loss)
-
                     if (n * num_batch + i) % 100 == 0:
                         acc = accuracy.eval({x: test_x, y: test_y, keep_prob_5: 1.0, keep_prob_75: 1.0})
                         print('round: %s, batch: %s, accuracy: %s' % (str(r + 1), str(n), str(acc)))  # 输出每一个batch的准确度
+                        # 第一个参数是可视化后的图名，第二个参数是模型中实际的变量
+                        acc_summary = scalar_summary('accuracy', acc)
                         test_acc.append(acc)
-
         # 保存模型
         saver.save(sess, 'my_net/train_faces.model', global_step=n * num_batch + i)
         print('saved')

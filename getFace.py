@@ -4,7 +4,7 @@ import os
 import random
 
 # 图片输出目录
-output_dir = './datasets/fu_di'
+output_dir = './datasets/feng_jing_xuan'
 # 输出图片大小
 size = 64
 
@@ -32,7 +32,7 @@ def relight(img, light=1, bias=0):
 # 使用dlib自带的frontal_face_detector作为特征提取器
 detector = dlib.get_frontal_face_detector()
 # 打开摄像头 参数为输入流，可以为摄像头或视频文件
-camera = cv2.VideoCapture(0)
+camera = cv2.VideoCapture('./001.mp4')
 cv2.namedWindow('frame', cv2.WINDOW_NORMAL)
 
 index = 1
@@ -53,6 +53,9 @@ while True:
             y1 = d.bottom() if d.bottom() > 0 else 0
             x2 = d.left() if d.left() > 0 else 0
             y2 = d.right() if d.right() > 0 else 0
+
+            cv2.rectangle(img, (x2, x1), (y2, y1), (255, 0, 0), 3)
+            cv2.imshow('frame', img)
 
             face = img[x1:y1, x2:y2]
             # 改变图片的亮度与对比度
