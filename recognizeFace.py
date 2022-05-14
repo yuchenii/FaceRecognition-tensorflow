@@ -1,13 +1,10 @@
-import os
-from datetime import time
-
 import tensorflow.compat.v1 as tf
-
-tf.compat.v1.disable_eager_execution()
+import os
 import cv2
 import dlib
 import sys
 
+tf.compat.v1.disable_eager_execution()
 size = 64
 
 x = tf.placeholder(tf.float32, [None, size, size, 3])
@@ -89,15 +86,15 @@ saver.restore(sess, tf.train.latest_checkpoint('my_net'))
 def recognize(image):
     res = sess.run(results, feed_dict={x: [image / 255.0], keep_prob_5: 1.0, keep_prob_75: 1.0})
     if res[0] == 0:
-        return '付迪'
-    if res[0] == 1:
         return '陈磊'
-    if res[0] == 2:
+    if res[0] == 1:
         return '冯靖轩'
+    if res[0] == 2:
+        return '付迪'
     if res[0] == 3:
-        return '匡斌'
-    if res[0] == 4:
         return '高康悦'
+    if res[0] == 4:
+        return '匡斌'
     else:
         return 'unknown'
     # return str(res)
@@ -105,8 +102,6 @@ def recognize(image):
 
 # 使用dlib.frontal_face_detector作特征提取器
 detector = dlib.get_frontal_face_detector()
-
-# mapping = "{'./datasets/chen_lei': 0, './datasets/feng_jing_xuan': 1, './datasets/fu_di': 2, './datasets/gao_kang_yue': 3, './datasets/kuang_bin': 4, './other_faces': 5}"
 
 
 path = input("请输入视频文件所在路径，否则将使用摄像头：")
@@ -117,12 +112,14 @@ else:
     cam = cv2.VideoCapture(0)
     print('未找到文件，使用摄像头检测')
 
+cv2.namedWindow("image",  cv2.WINDOW_NORMAL)
 while True:
     _, img = cam.read()
-    cv2.waitKey(100)
+    cv2.imshow('image', img)
     gray_image = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     dets = detector(gray_image, 1)
     if not len(dets):
+        print('未检测到人脸，按ESC键退出')
         key = cv2.waitKey(30) & 0xff
         if key == 27:
             sys.exit(0)
@@ -132,15 +129,19 @@ while True:
         y1 = d.bottom() if d.bottom() > 0 else 0
         x2 = d.left() if d.left() > 0 else 0
         y2 = d.right() if d.right() > 0 else 0
+
+        cv2.rectangle(img, (x2, x1), (y2, y1), (255, 0, 0), 3)
+        cv2.imshow('image', img)
+
         face = img[x1:y1, x2:y2]
         face = cv2.resize(face, (size, size))
         print('%s' % recognize(face))
 
-        cv2.rectangle(img, (x2, x1), (y2, y1), (255, 0, 0), 3)
-        cv2.namedWindow("image", 0)
-        cv2.imshow('image', img)
         key = cv2.waitKey(30) & 0xff
         if key == 27:
             sys.exit(0)
 
 sess.close()
+# 结束后释放VideoCapture对象
+cam.release()
+cv2.destroyAllWindows()

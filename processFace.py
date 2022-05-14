@@ -1,10 +1,9 @@
-import sys
 import os
 import cv2
 import dlib
 
 input_path = './input_img'
-output_path = './other_facesss'
+output_path = './datasets/other_faces'
 size = 64
 
 # 判断路径是否存在

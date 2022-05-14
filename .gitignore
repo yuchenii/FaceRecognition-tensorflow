@@ -1,7 +1,6 @@
 .idea/
 ./datasets/
 ./imput_img/
-./other_faces/
-./tmp/
+./logs/
 ./videos/
 ./my_net/

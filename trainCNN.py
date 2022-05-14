@@ -1,21 +1,17 @@
 import tensorflow.compat.v1 as tf
-from tensorflow.python.ops.logging_ops import scalar_summary
-
-tf.compat.v1.disable_eager_execution()
 import cv2
 import numpy as np
 import os
 import random
 import matplotlib.pyplot as plt
-import sys
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 # 自动分配显存
 from tensorflow.compat.v1 import ConfigProto
 from tensorflow.compat.v1 import InteractiveSession
-import tensorboard
+from tensorflow.python.ops.logging_ops import scalar_summary
 
-
+tf.compat.v1.disable_eager_execution()
 config = ConfigProto()
 config.gpu_options.allow_growth = True
 session = InteractiveSession(config=config)
@@ -25,7 +21,7 @@ gao_path = 'datasets/gao_kang_yue'
 kuang_path = 'datasets/kuang_bin'
 chen_path = 'datasets/chen_lei'
 fu_path = 'datasets/fu_di'
-other_faces_path = './other_faces'
+other_faces_path = 'datasets/other_faces'
 size = 64
 
 imgs = []
@@ -33,7 +29,6 @@ labs = []
 
 train_loss_results = []  # 将每轮的loss记录在此列表中，为后续画loss曲线提供数据
 test_acc = []  # 将每轮的acc记录在此列表中，为后续画acc曲线提供数据
-
 
 
 # 获取图片短边的padding大小
@@ -117,9 +112,7 @@ train_x = train_x.astype('float32') / 255.0
 test_x = test_x.astype('float32') / 255.0
 
 print('train size:%s, test size:%s' % (len(train_x), len(test_x)))
-# 每一个batch为100张图片
-batch_size = 100
-num_batch = len(train_x) // batch_size
+
 
 x = tf.placeholder(tf.float32, [None, size, size, 3])
 y = tf.placeholder(tf.float32, [None, 6])
@@ -189,6 +182,9 @@ def cnn():
     out = tf.add(tf.matmul(dropf, Wout), bout)
     return out
 
+# 每一个batch为100张图片
+batch_size = 100
+num_batch = len(train_x) // batch_size
 
 def cnnTrain():
     out = cnn()
@@ -213,7 +209,6 @@ def cnnTrain():
         for r in range(1):  # 训练轮数
             print('Round', r + 1)
             for n in range(10):
-                loss_sum = 0
                 for i in range(num_batch):
                     batch_x = train_x[i * batch_size: (i + 1) * batch_size]
                     batch_y = train_y[i * batch_size: (i + 1) * batch_size]

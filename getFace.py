@@ -32,7 +32,7 @@ def relight(img, light=1, bias=0):
 # 使用dlib自带的frontal_face_detector作为特征提取器
 detector = dlib.get_frontal_face_detector()
 # 打开摄像头 参数为输入流，可以为摄像头或视频文件
-camera = cv2.VideoCapture('./001.mp4')
+camera = cv2.VideoCapture('./videos/001.mp4')
 cv2.namedWindow('frame', cv2.WINDOW_NORMAL)
 
 index = 1
